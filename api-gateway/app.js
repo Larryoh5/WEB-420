@@ -14,7 +14,6 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var mongoose = require("mongoose");
 var apiCatalog = require("./routes/api-catalog");
-
 var indexRouter = require("./routes/index");
 
 // Connect to MongoDB ***** PLEASE LET ME KNOW IF YOU NEED THE ACTUAL URL *****

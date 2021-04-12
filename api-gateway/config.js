@@ -4,7 +4,7 @@ config.web = {};
 
 config.web.port = process.env.PORT || "3000";
 
-// public key
+// Public key
 config.web.secret = "topsecret";
 
 module.exports = config;
