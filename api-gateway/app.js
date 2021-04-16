@@ -7,58 +7,55 @@
 ;===========================================
 */
 
-var createError = require("http-errors");
-var express = require("express");
-var path = require("path");
-var cookieParser = require("cookie-parser");
-var logger = require("morgan");
-var mongoose = require("mongoose");
-var apiCatalog = require("./routes/api-catalog");
-var indexRouter = require("./routes/index");
+var createError = require('http-errors');
+var express = require('express');
+var path = require('path');
+var cookieParser = require('cookie-parser');
+var logger = require('morgan');
+var indexRouter = require('./routes/index');
 
-// Connect to MongoDB ***** PLEASE LET ME KNOW IF YOU NEED THE ACTUAL URL *****
-var mongoDB = "mongodb://localhost:27017/test";
-mongoose.connect(mongoDB, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
-mongoose.Promise = global.Promise;
-var db = mongoose.connection;
-db.on("error", console.error.bind(console, "MongoDB connected error: "));
-db.once("open", function () {
-  console.log("Application connected to mLab MongoDB instance");
-});
+var mongoose = require('mongoose');
+mongoose.Promise = require('bluebird');
 
 var app = express();
+var apiCatalog = require('./routes/api-catalog'); //Added for week 2. Require statement for api-catalog routes
+const { EINPROGRESS } = require('constants');
+
+/***Database connection*/
+mongoose.connect('mongodb+srv://admin:admin@buwebdev-cluster-1.ltgx9.mongodb.net/api-gateway', {
+  promiseLibrary: require('bluebird')
+}).then ( () => console.log('connection successful'))
+  .catch( (err) => console.error(err));
 
 // view engine setup
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "ejs");
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 
-app.use(logger("dev"));
+app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, 'public')));
 
-app.use("/", indexRouter);
-app.use("/api", apiCatalog); // register the API catalog's routes
+app.use('/', indexRouter);
+app.use('/api', apiCatalog); //Register the API Catalog’s routes
 
 // catch 404 and forward to error handler
-app.use(function (req, res, next) {
-  next(createError(404));
+app.use(function(req, res, next) {
+  var err = new Error ("Not Found");
+  err.status = 404;
+  next(err);
 });
 
 // error handler
-app.use(function (err, req, res, next) {
+app.use(function(err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
-  res.locals.error = req.app.get("env") === "development" ? err : {};
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
 
   // render the error page
   res.status(err.status || 500);
-  res.render("error");
+  res.render('error');
 });
 
 module.exports = app;

@@ -20,7 +20,7 @@ const User = (module.exports = mongoose.model("User", userSchema));
 module.exports.add = (user, callback) => {
   user.save(callback);
 };
-//getById call back function
+
 module.exports.getById = (id, callback) => {
   var query = { _id: id };
   User.findById(query, callback);
