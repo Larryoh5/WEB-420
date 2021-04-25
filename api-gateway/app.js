@@ -7,42 +7,53 @@
 ;===========================================
 */
 
-var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
-var cookieParser = require('cookie-parser');
+var favicon = require('serve-favicon');
 var logger = require('morgan');
-var indexRouter = require('./routes/index');
-
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');
 
-var app = express();
-var apiCatalog = require('./routes/api-catalog'); //Added for week 2. Require statement for api-catalog routes
-const { EINPROGRESS } = require('constants');
 
-/***Database connection*/
-mongoose.connect('mongodb+srv://admin:admin@buwebdev-cluster-1.ltgx9.mongodb.net/api-gateway', {
-  promiseLibrary: require('bluebird')
+var index = require('./routes/index');
+var apiCatalog = require('./routes/api-catalog');
+
+
+var app = express();
+
+/**
+ *
+ * Database connection
+ */
+mongoose.connect('mongodb://admin:admin@ds125578.mlab.com:25578/api-gateway', {
+    promiseLibrary: require('bluebird')
 }).then ( () => console.log('connection successful'))
   .catch( (err) => console.error(err));
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
+
+// uncomment after placing your favicon in /public
+//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
-app.use('/api', apiCatalog); //Register the API Catalog’s routes
+
+app.use('/', index);
+app.use('/api', apiCatalog);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  var err = new Error ("Not Found");
+  var err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
